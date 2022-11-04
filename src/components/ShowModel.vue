@@ -28,8 +28,6 @@ let camera,
   effect,
   gui,
   raycaster,
-  lastX,
-  lastY,
   skyBox,
   labelRenderer
   ;
@@ -97,6 +95,10 @@ const option = {
         // 设置鼠标移动事件
         document.onmousemove = (e) => {
           console.log('+++++++++++++ onmousedown');
+          
+          // 设置鼠标样式为小手
+          e.target.style.cursor = 'pointer';
+
           e = e || window.event;
           e.preventDefault();
           // 计算当前鼠标位置和初始位置差值
@@ -118,11 +120,14 @@ const option = {
           newDiv.style.transform = 'translate(-50%, -50%) translate(' + translateX + 'px,' + translateY + 'px)';
         }
 
-        document.onmouseup = (_event) => {
+        document.onmouseup = (event) => {
           console.log('+++++++++++++ onmouseup');
           // 取消onmouseup、onmousemove事件监听
           document.onmouseup = null;
           document.onmousemove = null;
+
+          // 设置为默认鼠标样式
+          event.target.style.cursor = 'auto';
 
           // 相机控制器激活
           controls.enabled = true;
