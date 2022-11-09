@@ -31,7 +31,8 @@ let camera,
   raycaster,
   skyBox,
   labelRenderer,
-  defaultFOV
+  defaultFOV,
+  infoMap
   ;
 
 var STATE_TYPE = {
@@ -80,6 +81,9 @@ const option = {
       // 创建新的div
       const newDiv = document.createElement('div');
       newDiv.className = option.type;
+
+      // 记录热点属性
+      infoMap.set(newDiv, [option.title, option.content, option.systemIcon]);
 
       // 外层div flex direction center
       const border = document.createElement('div');
@@ -135,35 +139,67 @@ const option = {
         if (option.state === STATE_TYPE.RUNTIME) {
           // 判断类型
           if (newDiv.className === SPOT_TYPE.TEXT) {
+            // 获取mainDiv
             const mainDiv = document.getElementById('mainDiv');
+            // 创建文本窗口
             const textWindow = document.createElement('div');
             textWindow.style.width = '30%';
             textWindow.style.height = '10%';
             textWindow.style.position = 'absolute';
             textWindow.style.left = '35%';
-            textWindow.style.top = '45%';
+            textWindow.style.top = '40%';
             textWindow.style.backgroundColor = 'white';
-            textWindow.title = option.title;
-            textWindow.textContent = option.content;
+            textWindow.style.display = 'flex';
+            textWindow.style.flexDirection = 'column';
+            textWindow.style.alignItems = 'center';
             textWindow.style.zIndex = 20;
+            mainDiv.appendChild(textWindow);
 
-           
-            // textWindow.style.textAlign = 'center';
+            // 获取当前热点属性
+            const info = infoMap.get(newDiv);
 
+            // 创建标题栏
+            const titleBar = document.createElement('div');
+            titleBar.style.width = '100%';
+            titleBar.style.height = '25px';
+            titleBar.textContent = info[0];
+            titleBar.style.borderBottomColor = 'gray';
+            titleBar.style.borderBottom = '1px solid'
+            titleBar.style.paddingLeft = '4px';
+            titleBar.style.fontSize = 'medium';
+            titleBar.style.fontWeight = '600';
+            textWindow.appendChild(titleBar);
+
+            // 创建关闭按钮
             const closeButton = document.createElement('div');
             closeButton.style.position = 'absolute';
-            closeButton.style.top = '16px';
-            closeButton.style.right = '16px';
+            closeButton.style.top = '4px';
+            closeButton.style.right = '2px';
             closeButton.style.background = 'url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)'; 
             closeButton.style.width = '16px';
             closeButton.style.height = '16px';
             closeButton.style.backgroundSize = 'contain';
             closeButton.style.backgroundPosition = 'center';
-            textWindow.appendChild(closeButton);
+            closeButton.onclick = (e)=>{
+              // 移除文本窗口
+              textWindow.remove();
+              // 激活相机控制器
+              controls.enabled =  true;
+            }
+            titleBar.appendChild(closeButton);
 
+            // 创建文本框
+            const textDiv = document.createElement('div');
+            textDiv.style.width = '100%';
+            textDiv.style.height = '100%';
+            textDiv.style.backgroundColor = 'white';
+            textDiv.textContent = info[1];
+            textDiv.style.paddingLeft = '4px';
+            textDiv.style.paddingRight = '4px';
+            textWindow.appendChild(textDiv);
 
-
-            mainDiv.appendChild(textWindow);
+            // 关闭相机控制器
+            controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.AUDIO) {
 
           } else if (newDiv.className === SPOT_TYPE.IMAGE) {
@@ -279,6 +315,7 @@ export default {
   methods: {
 
     initScene(modelUrl) {
+      infoMap = new Map();
       // 添加GUI
       gui = new GUI();
       const hotspotTypeFolder = gui.addFolder('hotspotType');
