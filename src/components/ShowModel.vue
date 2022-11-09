@@ -15,6 +15,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { OutlineEffect } from "three/examples/jsm/effects/OutlineEffect";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
 import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
+import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
 
 
 let camera,
@@ -29,14 +30,41 @@ let camera,
   gui,
   raycaster,
   skyBox,
-  labelRenderer
+  labelRenderer,
+  defaultFOV
   ;
 
+var STATE_TYPE = {
+  EDITOR: 'editor',
+  RUNTIME: 'runtime',
+}
+
+var SPOT_TYPE = {
+  TEXT: 'text',
+  IMAGE: 'image',
+  VIDEO: 'video',
+  AUDIO: 'audio',
+  LINK: 'link',
+  PANORAMA_LINK: 'panorama_link',
+}
+
+var SYSTEM_ICON = {
+  TEXT: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png',
+  IMAGE: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/57_static_gallery.png',
+  VIDEO: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/56_static_video.png',
+  AUDIO: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/55_static_music.png',
+  LINK: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/53_static_link.png',
+  PANORAMA_LINK: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/18_new_spotd1.png',
+}
+
 const option = {
-  type: 'text',
-  textContent: '文本热点',
-  image: '',
+  type: SPOT_TYPE.TEXT,
+  title: '输入标题',
+  content: '垂直居中单独文字只需要设置css样式line-height属性即可。cal-align:middle垂直居中属性，如img{vertical-align:middle;}',
+  systemIcon: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png',
+  state: 'editor',
   addHotSpot: () => {
+    if (option.state === STATE_TYPE.RUNTIME) return;
 
     const mouse = new THREE.Vector2();
     // 默认在屏幕中间添加热点文本
@@ -51,9 +79,39 @@ const option = {
 
       // 创建新的div
       const newDiv = document.createElement('div');
-      newDiv.className = '文本热点';
-      // 设置文本内容
-      newDiv.textContent = option.textContent;
+      newDiv.className = option.type;
+
+      // 外层div flex direction center
+      const border = document.createElement('div');
+      border.style.display = 'flex';
+      border.style.flexDirection = 'column';
+      border.style.alignItems = 'center';
+      border.style.justifyItems = 'center';
+      newDiv.appendChild(border);
+
+      // 添加标题
+      const title = document.createElement('div');
+      title.textContent = option.title;
+      // title.style.fontWeight = '450';
+      title.style.fontSize = '14px';
+      title.style.padding = '3px 10px 3px 10px';
+      title.style.backgroundColor = 'black';
+      title.style.opacity = '0.7';
+      title.style.borderRadius = '4px';
+      // 文字颜色
+      title.style.color = 'white';
+      border.appendChild(title);
+
+      // 创建icon
+      const image = document.createElement('div');
+      // 图片size
+      image.style.width = '52px';
+      image.style.height = '52px';
+      // 设置icon url
+      image.style.background = 'url(' + option.systemIcon + ')';
+      image.style.backgroundSize = 'contain';
+      image.style.backgroundPosition = 'center';
+      border.appendChild(image);
 
       // 创建对应的CSS2DObject
       const newDivObject = new CSS2DObject(newDiv);
@@ -72,8 +130,53 @@ const option = {
         event.target.style.cursor = 'pointer';
       }
 
-      // 设置鼠标点击事件
+      // 监听鼠标点击事件
       newDiv.onmousedown = (e) => {
+        if (option.state === STATE_TYPE.RUNTIME) {
+          // 判断类型
+          if (newDiv.className === SPOT_TYPE.TEXT) {
+            const mainDiv = document.getElementById('mainDiv');
+            const textWindow = document.createElement('div');
+            textWindow.style.width = '30%';
+            textWindow.style.height = '10%';
+            textWindow.style.position = 'absolute';
+            textWindow.style.left = '35%';
+            textWindow.style.top = '45%';
+            textWindow.style.backgroundColor = 'white';
+            textWindow.title = option.title;
+            textWindow.textContent = option.content;
+            textWindow.style.zIndex = 20;
+
+           
+            // textWindow.style.textAlign = 'center';
+
+            const closeButton = document.createElement('div');
+            closeButton.style.position = 'absolute';
+            closeButton.style.top = '16px';
+            closeButton.style.right = '16px';
+            closeButton.style.background = 'url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)'; 
+            closeButton.style.width = '16px';
+            closeButton.style.height = '16px';
+            closeButton.style.backgroundSize = 'contain';
+            closeButton.style.backgroundPosition = 'center';
+            textWindow.appendChild(closeButton);
+
+
+
+            mainDiv.appendChild(textWindow);
+          } else if (newDiv.className === SPOT_TYPE.AUDIO) {
+
+          } else if (newDiv.className === SPOT_TYPE.IMAGE) {
+
+          } else if (newDiv.className === SPOT_TYPE.LINK) {
+
+          } else if (newDiv.className === SPOT_TYPE.VIDEO) {
+
+          } else if (newDiv.className === SPOT_TYPE.PANORAMA_LINK) {
+
+          }
+          return;
+        }
         console.log('+++++++++++++ onmousedown');
         // 暂停更新div位置
         newDiv.threeObject.isCSS2DObject = false;
@@ -95,7 +198,7 @@ const option = {
         // 设置鼠标移动事件
         document.onmousemove = (e) => {
           console.log('+++++++++++++ onmousedown');
-          
+
           // 设置鼠标样式为小手
           e.target.style.cursor = 'pointer';
 
@@ -121,6 +224,7 @@ const option = {
         }
 
         document.onmouseup = (event) => {
+          if (option.state === STATE_TYPE.RUNTIME) return;
           console.log('+++++++++++++ onmouseup');
           // 取消onmouseup、onmousemove事件监听
           document.onmouseup = null;
@@ -149,6 +253,8 @@ const option = {
           }
         }
       }
+
+
     }
   }
 };
@@ -173,23 +279,71 @@ export default {
   methods: {
 
     initScene(modelUrl) {
-
       // 添加GUI
       gui = new GUI();
-      gui
-        .add(option, 'type', ['text', 'image', 'video'])
+      const hotspotTypeFolder = gui.addFolder('hotspotType');
+      const titleFolder = gui.addFolder('title');
+      const iconFolder = gui.addFolder('icon');
+      const contentFolder = gui.addFolder('content');
+
+      hotspotTypeFolder
+        .add(option, 'type', [SPOT_TYPE.TEXT, SPOT_TYPE.IMAGE, SPOT_TYPE.VIDEO, SPOT_TYPE.AUDIO, SPOT_TYPE.LINK, SPOT_TYPE.PANORAMA_LINK])
         .onChange(
           (value) => {
             console.log(value);
           }
         );
 
-      // 设置textContent
-      gui
-        .add(option, 'textContent')
+      // 设置title
+      titleFolder
+        .add(option, 'title')
         .onChange(
           (value) => {
-            option.textContent = value;
+            option.title = value;
+          }
+        );
+
+      // 设置title
+      iconFolder
+        .add(option, 'systemIcon', [SYSTEM_ICON.TEXT, SYSTEM_ICON.IMAGE, SYSTEM_ICON.VIDEO, SYSTEM_ICON.AUDIO, SYSTEM_ICON.LINK, SYSTEM_ICON.PANORAMA_LINK])
+        .onChange(
+          (value) => {
+            // option.title = value;
+
+          }
+        );
+
+      // 内容
+      contentFolder
+        .add(option, 'content')
+        .onChange(
+          (value) => {
+            option.content = value;
+          }
+        );
+
+
+      gui
+        .add(option, 'state', [STATE_TYPE.EDITOR, STATE_TYPE.RUNTIME])
+        .onChange(
+          (value) => {
+            if (value === STATE_TYPE.RUNTIME) {
+              // todo:预览动画
+              if (camera) {
+                var step = { fov: 130 };
+                TWEEN.removeAll();
+                // 使用tween创建fov动画
+                const tween = new TWEEN.Tween(step);
+                tween.to({ fov: defaultFOV }, 1000);
+                tween.easing(TWEEN.Easing.Exponential.InOut);
+                tween.onUpdate(() => {
+                  camera.fov = step.fov;
+                  camera.updateProjectionMatrix();
+                });
+                tween.start();
+              }
+
+            }
           }
         );
 
@@ -211,6 +365,7 @@ export default {
         30,
         cameraMaxDistance
       );
+      defaultFOV = camera.fov;
 
       camera.position.set(0, 0, 100);
 
@@ -257,7 +412,8 @@ export default {
       labelRenderer.setSize(window.innerWidth, window.innerHeight);
       labelRenderer.domElement.style.position = 'absolute';
       labelRenderer.domElement.style.top = '0px';
-      document.body.appendChild(labelRenderer.domElement);
+      const mainDiv = document.getElementById('mainDiv');
+      mainDiv.appendChild(labelRenderer.domElement);
 
       // 添加相机控制器
       controls = new OrbitControls(camera, labelRenderer.domElement);
@@ -424,6 +580,7 @@ export default {
     // 点击事件
     onClick(event) {
       event.preventDefault();
+
       const mouse = new THREE.Vector2();
       mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
       mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
@@ -461,6 +618,8 @@ export default {
       effect.render(scene_selectObjects, camera);
       renderer.autoClear = true;
       effect.autoClear = renderer.autoClear;
+
+      TWEEN.update();
     },
     // 清空场景
     destroy() {
@@ -491,6 +650,12 @@ export default {
 </script>
 
 <style scoped>
+#mainDiv {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
 #three {
   width: 100%;
   height: 100%;
