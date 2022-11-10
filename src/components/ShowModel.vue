@@ -165,7 +165,7 @@ const option = {
             popWindow.style.display = "flex";
             popWindow.style.flexDirection = "column";
             popWindow.style.alignItems = "center";
-            popWindow.style.zIndex = 20;
+            popWindow.style.zIndex = 2000;
             mainDiv.appendChild(popWindow);
 
             // 获取当前热点属性
@@ -230,7 +230,7 @@ const option = {
             popWindow.style.display = "flex";
             popWindow.style.flexDirection = "column";
             popWindow.style.alignItems = "center";
-            popWindow.style.zIndex = 20;
+            popWindow.style.zIndex = 2000;
             popWindow.opacity = 0.8;
             mainDiv.appendChild(popWindow);
 
@@ -282,7 +282,126 @@ const option = {
             // 关闭相机控制器
             controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.AUDIO) {
+             // 获取mainDiv
+             const mainDiv = document.getElementById("mainDiv");
+            // 创建文本窗口
+            const popWindow = document.createElement("div");
+            popWindow.style.width = "120px";
+            popWindow.style.position = "absolute";
+            popWindow.style.left = "48%";
+            popWindow.style.top = "5%";
+            popWindow.style.backgroundColor = "white";
+            popWindow.style.display = "flex";
+            popWindow.style.flexDirection = "column";
+            popWindow.style.alignItems = "center";
+            popWindow.style.zIndex = 2000;
+            popWindow.opacity = 0.8;
+            mainDiv.appendChild(popWindow);
+
+            // 获取当前热点属性
+            const info = infoMap.get(newDiv);
+
+            // 创建标题栏
+            const titleBar = document.createElement("div");
+            titleBar.style.width = "100%";
+            titleBar.style.height = "25px";
+            titleBar.textContent = 'Samurai.mp3';
+            // titleBar.style.borderBottomColor = "gray";
+            // titleBar.style.borderBottom = "1px solid";
+            titleBar.style.paddingLeft = "4px";
+            titleBar.style.fontSize = "medium";
+            titleBar.style.fontWeight = "600";
+            popWindow.appendChild(titleBar);
+
+            // 创建音频
+            var mp3Url = "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/test/HoliznaCC0%20-%20Way%20Of%20The%20Samurai.mp3";
+            var player = new Audio(mp3Url);
+            player.play(); //播放 mp3这个音频对象
+            
+
+            // 创建关闭按钮
+            const closeButton = document.createElement("div");
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "4px";
+            closeButton.style.right = "2px";
+            closeButton.style.background =
+              "url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)";
+            closeButton.style.width = "16px";
+            closeButton.style.height = "16px";
+            closeButton.style.backgroundSize = "contain";
+            closeButton.style.backgroundPosition = "center";
+            closeButton.player = player;
+            closeButton.onclick = (e) => {
+              // 移除文本窗口
+              popWindow.remove();
+              // 激活相机控制器
+              controls.enabled = true;
+              player.pause();
+            };
+            titleBar.appendChild(closeButton);
+
           } else if (newDiv.className === SPOT_TYPE.LINK) {
+            // 获取mainDiv
+            const mainDiv = document.getElementById("mainDiv");
+            // 创建文本窗口
+            const popWindow = document.createElement("div");
+            popWindow.style.width = "80%";
+            popWindow.style.height = "80%";
+            popWindow.style.position = "absolute";
+            popWindow.style.left = "10%";
+            popWindow.style.top = "10%";
+            popWindow.style.backgroundColor = "white";
+            popWindow.style.display = "flex";
+            popWindow.style.flexDirection = "column";
+            popWindow.style.alignItems = "center";
+            popWindow.style.zIndex = 2000;
+            popWindow.opacity = 0.8;
+            mainDiv.appendChild(popWindow);
+
+            // 获取当前热点属性
+            const info = infoMap.get(newDiv);
+
+            // 创建标题栏
+            const titleBar = document.createElement("div");
+            titleBar.style.width = "100%";
+            titleBar.style.height = "25px";
+            titleBar.textContent = info[0];
+            // titleBar.style.borderBottomColor = "gray";
+            // titleBar.style.borderBottom = "1px solid";
+            titleBar.style.paddingLeft = "4px";
+            titleBar.style.fontSize = "medium";
+            titleBar.style.fontWeight = "600";
+            popWindow.appendChild(titleBar);
+
+            // 创建关闭按钮
+            const closeButton = document.createElement("div");
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "4px";
+            closeButton.style.right = "2px";
+            closeButton.style.background =
+              "url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)";
+            closeButton.style.width = "16px";
+            closeButton.style.height = "16px";
+            closeButton.style.backgroundSize = "contain";
+            closeButton.style.backgroundPosition = "center";
+            closeButton.onclick = (e) => {
+              // 移除文本窗口
+              popWindow.remove();
+              // 激活相机控制器
+              controls.enabled = true;
+            };
+            titleBar.appendChild(closeButton);
+
+            // 创建内容div
+            const content = document.createElement("object");
+            content.style.width = "100%";
+            content.style.height = "100%";
+            content.data = "https://www.alibabagroup.com/";
+            content.type = 'text/html';
+            popWindow.appendChild(content);
+
+            // 关闭相机控制器
+            controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.VIDEO) {
             // 获取mainDiv
             const mainDiv = document.getElementById("mainDiv");
@@ -297,7 +416,7 @@ const option = {
             popWindow.style.display = "flex";
             popWindow.style.flexDirection = "column";
             popWindow.style.alignItems = "center";
-            popWindow.style.zIndex = 20;
+            popWindow.style.zIndex = 2000;
             popWindow.opacity = 0.8;
             mainDiv.appendChild(popWindow);
 
