@@ -4,7 +4,12 @@
       <text id="errorText" v-if="showErrorInfo">加载失败，请检查资源</text>
     </div>
     <canvas id="threeCanvas" ref="threeCanvas"></canvas>
-    <progress id="progress" v-if="showProgress" :value="progressValue" max="100"></progress>
+    <progress
+      id="progress"
+      v-if="showProgress"
+      :value="progressValue"
+      max="100"
+    ></progress>
   </div>
 </template>
 
@@ -14,9 +19,11 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader";
 import { OutlineEffect } from "three/examples/jsm/effects/OutlineEffect";
 import { GUI } from "three/addons/libs/lil-gui.module.min.js";
-import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
-import { TWEEN } from 'three/examples/jsm/libs/tween.module.min.js';
-
+import {
+  CSS2DRenderer,
+  CSS2DObject,
+} from "three/addons/renderers/CSS2DRenderer.js";
+import { TWEEN } from "three/examples/jsm/libs/tween.module.min.js";
 
 let camera,
   scene,
@@ -32,38 +39,44 @@ let camera,
   skyBox,
   labelRenderer,
   defaultFOV,
-  infoMap
-  ;
+  infoMap,
+  systemIconUI;
 
 var STATE_TYPE = {
-  EDITOR: 'editor',
-  RUNTIME: 'runtime',
-}
+  EDITOR: "editor",
+  RUNTIME: "runtime",
+};
 
 var SPOT_TYPE = {
-  TEXT: 'text',
-  IMAGE: 'image',
-  VIDEO: 'video',
-  AUDIO: 'audio',
-  LINK: 'link',
-  PANORAMA_LINK: 'panorama_link',
-}
+  TEXT: "text",
+  IMAGE: "image",
+  VIDEO: "video",
+  AUDIO: "audio",
+  LINK: "link",
+  PANORAMA_LINK: "panorama_link",
+};
 
 var SYSTEM_ICON = {
-  TEXT: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png',
-  IMAGE: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/57_static_gallery.png',
-  VIDEO: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/56_static_video.png',
-  AUDIO: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/55_static_music.png',
-  LINK: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/53_static_link.png',
-  PANORAMA_LINK: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/18_new_spotd1.png',
-}
+  TEXT: "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png",
+  IMAGE:
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/57_static_gallery.png",
+  VIDEO:
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/56_static_video.png",
+  AUDIO:
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/55_static_music.png",
+  LINK: "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/53_static_link.png",
+  PANORAMA_LINK:
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/18_new_spotd1.png",
+};
 
 const option = {
   type: SPOT_TYPE.TEXT,
-  title: '输入标题',
-  content: '垂直居中单独文字只需要设置css样式line-height属性即可。cal-align:middle垂直居中属性，如img{vertical-align:middle;}',
-  systemIcon: 'https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png',
-  state: 'editor',
+  title: "文本热点",
+  content:
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/test/mobile_f.jpg",
+  systemIcon:
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png",
+  state: "editor",
   addHotSpot: () => {
     if (option.state === STATE_TYPE.RUNTIME) return;
 
@@ -79,42 +92,42 @@ const option = {
       const position = intersections[0].point;
 
       // 创建新的div
-      const newDiv = document.createElement('div');
+      const newDiv = document.createElement("div");
       newDiv.className = option.type;
 
       // 记录热点属性
       infoMap.set(newDiv, [option.title, option.content, option.systemIcon]);
 
       // 外层div flex direction center
-      const border = document.createElement('div');
-      border.style.display = 'flex';
-      border.style.flexDirection = 'column';
-      border.style.alignItems = 'center';
-      border.style.justifyItems = 'center';
+      const border = document.createElement("div");
+      border.style.display = "flex";
+      border.style.flexDirection = "column";
+      border.style.alignItems = "center";
+      border.style.justifyItems = "center";
       newDiv.appendChild(border);
 
       // 添加标题
-      const title = document.createElement('div');
+      const title = document.createElement("div");
       title.textContent = option.title;
       // title.style.fontWeight = '450';
-      title.style.fontSize = '14px';
-      title.style.padding = '3px 10px 3px 10px';
-      title.style.backgroundColor = 'black';
-      title.style.opacity = '0.7';
-      title.style.borderRadius = '4px';
+      title.style.fontSize = "14px";
+      title.style.padding = "3px 10px 4px 10px";
+      title.style.backgroundColor = "black";
+      title.style.opacity = "0.7";
+      title.style.borderRadius = "4px";
       // 文字颜色
-      title.style.color = 'white';
+      title.style.color = "white";
       border.appendChild(title);
 
       // 创建icon
-      const image = document.createElement('div');
+      const image = document.createElement("div");
       // 图片size
-      image.style.width = '52px';
-      image.style.height = '52px';
+      image.style.width = "52px";
+      image.style.height = "52px";
       // 设置icon url
-      image.style.background = 'url(' + option.systemIcon + ')';
-      image.style.backgroundSize = 'contain';
-      image.style.backgroundPosition = 'center';
+      image.style.background = "url(" + option.systemIcon + ")";
+      image.style.backgroundSize = "contain";
+      image.style.backgroundPosition = "center";
       border.appendChild(image);
 
       // 创建对应的CSS2DObject
@@ -131,8 +144,8 @@ const option = {
 
       // 设置div鼠标悬停时样式
       newDiv.onmouseover = (event) => {
-        event.target.style.cursor = 'pointer';
-      }
+        event.target.style.cursor = "pointer";
+      };
 
       // 监听鼠标点击事件
       newDiv.onmousedown = (e) => {
@@ -140,80 +153,205 @@ const option = {
           // 判断类型
           if (newDiv.className === SPOT_TYPE.TEXT) {
             // 获取mainDiv
-            const mainDiv = document.getElementById('mainDiv');
+            const mainDiv = document.getElementById("mainDiv");
             // 创建文本窗口
-            const textWindow = document.createElement('div');
-            textWindow.style.width = '30%';
-            textWindow.style.height = '10%';
-            textWindow.style.position = 'absolute';
-            textWindow.style.left = '35%';
-            textWindow.style.top = '40%';
-            textWindow.style.backgroundColor = 'white';
-            textWindow.style.display = 'flex';
-            textWindow.style.flexDirection = 'column';
-            textWindow.style.alignItems = 'center';
-            textWindow.style.zIndex = 20;
-            mainDiv.appendChild(textWindow);
+            const popWindow = document.createElement("div");
+            popWindow.style.width = "30%";
+            popWindow.style.height = "20%";
+            popWindow.style.position = "absolute";
+            popWindow.style.left = "35%";
+            popWindow.style.top = "40%";
+            popWindow.style.backgroundColor = "white";
+            popWindow.style.display = "flex";
+            popWindow.style.flexDirection = "column";
+            popWindow.style.alignItems = "center";
+            popWindow.style.zIndex = 20;
+            mainDiv.appendChild(popWindow);
 
             // 获取当前热点属性
             const info = infoMap.get(newDiv);
 
             // 创建标题栏
-            const titleBar = document.createElement('div');
-            titleBar.style.width = '100%';
-            titleBar.style.height = '25px';
+            const titleBar = document.createElement("div");
+            titleBar.style.width = "100%";
+            titleBar.style.height = "25px";
             titleBar.textContent = info[0];
-            titleBar.style.borderBottomColor = 'gray';
-            titleBar.style.borderBottom = '1px solid'
-            titleBar.style.paddingLeft = '4px';
-            titleBar.style.fontSize = 'medium';
-            titleBar.style.fontWeight = '600';
-            textWindow.appendChild(titleBar);
+            titleBar.style.borderBottomColor = "gray";
+            titleBar.style.borderBottom = "1px solid";
+            titleBar.style.paddingLeft = "4px";
+            titleBar.style.fontSize = "medium";
+            titleBar.style.fontWeight = "600";
+            popWindow.appendChild(titleBar);
 
             // 创建关闭按钮
-            const closeButton = document.createElement('div');
-            closeButton.style.position = 'absolute';
-            closeButton.style.top = '4px';
-            closeButton.style.right = '2px';
-            closeButton.style.background = 'url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)'; 
-            closeButton.style.width = '16px';
-            closeButton.style.height = '16px';
-            closeButton.style.backgroundSize = 'contain';
-            closeButton.style.backgroundPosition = 'center';
-            closeButton.onclick = (e)=>{
+            const closeButton = document.createElement("div");
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "4px";
+            closeButton.style.right = "2px";
+            closeButton.style.background =
+              "url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)";
+            closeButton.style.width = "16px";
+            closeButton.style.height = "16px";
+            closeButton.style.backgroundSize = "contain";
+            closeButton.style.backgroundPosition = "center";
+            closeButton.onclick = (e) => {
               // 移除文本窗口
-              textWindow.remove();
+              popWindow.remove();
               // 激活相机控制器
-              controls.enabled =  true;
-            }
+              controls.enabled = true;
+            };
             titleBar.appendChild(closeButton);
 
             // 创建文本框
-            const textDiv = document.createElement('div');
-            textDiv.style.width = '100%';
-            textDiv.style.height = '100%';
-            textDiv.style.backgroundColor = 'white';
-            textDiv.textContent = info[1];
-            textDiv.style.paddingLeft = '4px';
-            textDiv.style.paddingRight = '4px';
-            textWindow.appendChild(textDiv);
+            const content = document.createElement("div");
+            content.style.width = "100%";
+            content.style.height = "100%";
+            content.style.backgroundColor = "white";
+            content.textContent = info[1];
+            content.style.paddingLeft = "4px";
+            content.style.paddingRight = "4px";
+            content.style.overflow = "hidden";
+            content.style.lineBreak = "anywhere";
+            popWindow.appendChild(content);
+
+            // 关闭相机控制器
+            controls.enabled = false;
+          } else if (newDiv.className === SPOT_TYPE.IMAGE) {
+            // 获取mainDiv
+            const mainDiv = document.getElementById("mainDiv");
+            // 创建文本窗口
+            const popWindow = document.createElement("div");
+            popWindow.style.width = "80%";
+            popWindow.style.height = "80%";
+            popWindow.style.position = "absolute";
+            popWindow.style.left = "10%";
+            popWindow.style.top = "10%";
+            popWindow.style.backgroundColor = "white";
+            popWindow.style.display = "flex";
+            popWindow.style.flexDirection = "column";
+            popWindow.style.alignItems = "center";
+            popWindow.style.zIndex = 20;
+            popWindow.opacity = 0.8;
+            mainDiv.appendChild(popWindow);
+
+            // 获取当前热点属性
+            const info = infoMap.get(newDiv);
+
+            // 创建标题栏
+            const titleBar = document.createElement("div");
+            titleBar.style.width = "100%";
+            titleBar.style.height = "25px";
+            titleBar.textContent = info[0];
+            // titleBar.style.borderBottomColor = "gray";
+            // titleBar.style.borderBottom = "1px solid";
+            titleBar.style.paddingLeft = "4px";
+            titleBar.style.fontSize = "medium";
+            titleBar.style.fontWeight = "600";
+            popWindow.appendChild(titleBar);
+
+            // 创建关闭按钮
+            const closeButton = document.createElement("div");
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "4px";
+            closeButton.style.right = "2px";
+            closeButton.style.background =
+              "url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)";
+            closeButton.style.width = "16px";
+            closeButton.style.height = "16px";
+            closeButton.style.backgroundSize = "contain";
+            closeButton.style.backgroundPosition = "center";
+            closeButton.onclick = (e) => {
+              // 移除文本窗口
+              popWindow.remove();
+              // 激活相机控制器
+              controls.enabled = true;
+            };
+            titleBar.appendChild(closeButton);
+
+            // 创建内容
+            const content = document.createElement("div");
+            content.style.width = "100%";
+            content.style.height = "100%";
+            content.style.background = "url(" + info[1] + ")";
+            content.style.backgroundSize = "contain";
+            content.style.backgroundPosition = "center";
+            content.style.backgroundRepeat = "no-repeat";
+
+            popWindow.appendChild(content);
 
             // 关闭相机控制器
             controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.AUDIO) {
-
-          } else if (newDiv.className === SPOT_TYPE.IMAGE) {
-
           } else if (newDiv.className === SPOT_TYPE.LINK) {
-
           } else if (newDiv.className === SPOT_TYPE.VIDEO) {
+            // 获取mainDiv
+            const mainDiv = document.getElementById("mainDiv");
+            // 创建文本窗口
+            const popWindow = document.createElement("div");
+            popWindow.style.width = "80%";
+            popWindow.style.height = "80%";
+            popWindow.style.position = "absolute";
+            popWindow.style.left = "10%";
+            popWindow.style.top = "10%";
+            popWindow.style.backgroundColor = "white";
+            popWindow.style.display = "flex";
+            popWindow.style.flexDirection = "column";
+            popWindow.style.alignItems = "center";
+            popWindow.style.zIndex = 20;
+            popWindow.opacity = 0.8;
+            mainDiv.appendChild(popWindow);
 
+            // 获取当前热点属性
+            const info = infoMap.get(newDiv);
+
+            // 创建标题栏
+            const titleBar = document.createElement("div");
+            titleBar.style.width = "100%";
+            titleBar.style.height = "25px";
+            titleBar.textContent = info[0];
+            // titleBar.style.borderBottomColor = "gray";
+            // titleBar.style.borderBottom = "1px solid";
+            titleBar.style.paddingLeft = "4px";
+            titleBar.style.fontSize = "medium";
+            titleBar.style.fontWeight = "600";
+            popWindow.appendChild(titleBar);
+
+            // 创建关闭按钮
+            const closeButton = document.createElement("div");
+            closeButton.style.position = "absolute";
+            closeButton.style.top = "4px";
+            closeButton.style.right = "2px";
+            closeButton.style.background =
+              "url(https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/close.png)";
+            closeButton.style.width = "16px";
+            closeButton.style.height = "16px";
+            closeButton.style.backgroundSize = "contain";
+            closeButton.style.backgroundPosition = "center";
+            closeButton.onclick = (e) => {
+              // 移除文本窗口
+              popWindow.remove();
+              // 激活相机控制器
+              controls.enabled = true;
+            };
+            titleBar.appendChild(closeButton);
+
+            // 创建内容div
+            const content = document.createElement("video");
+            content.style.width = "100%";
+            content.style.height = "100%";
+            content.src =
+              "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/test/Vite%20App%20-%20Google%20Chrome%202022-11-10%2016-11-53.mp4";
+            content.controls = true;
+            content.muted = false;
+            popWindow.appendChild(content);
+
+            // 关闭相机控制器
+            controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.PANORAMA_LINK) {
-
           }
           return;
         }
-        console.log('+++++++++++++ onmousedown');
+        console.log("+++++++++++++ onmousedown");
         // 暂停更新div位置
         newDiv.threeObject.isCSS2DObject = false;
         // 暂停相机控制
@@ -233,10 +371,10 @@ const option = {
 
         // 设置鼠标移动事件
         document.onmousemove = (e) => {
-          console.log('+++++++++++++ onmousedown');
+          console.log("+++++++++++++ onmousedown");
 
           // 设置鼠标样式为小手
-          e.target.style.cursor = 'pointer';
+          e.target.style.cursor = "pointer";
 
           e = e || window.event;
           e.preventDefault();
@@ -256,18 +394,23 @@ const option = {
           newDiv.lastTranslateY = translateY;
 
           // 设置translate，translate(-50%, -50%)与CSS2DRender保持一致
-          newDiv.style.transform = 'translate(-50%, -50%) translate(' + translateX + 'px,' + translateY + 'px)';
-        }
+          newDiv.style.transform =
+            "translate(-50%, -50%) translate(" +
+            translateX +
+            "px," +
+            translateY +
+            "px)";
+        };
 
         document.onmouseup = (event) => {
           if (option.state === STATE_TYPE.RUNTIME) return;
-          console.log('+++++++++++++ onmouseup');
+          console.log("+++++++++++++ onmouseup");
           // 取消onmouseup、onmousemove事件监听
           document.onmouseup = null;
           document.onmousemove = null;
 
           // 设置为默认鼠标样式
-          event.target.style.cursor = 'auto';
+          event.target.style.cursor = "auto";
 
           // 相机控制器激活
           controls.enabled = true;
@@ -282,17 +425,19 @@ const option = {
             if (intersections[0]) {
               const position = intersections[0].point;
               // 设置position
-              newDiv.threeObject.position.set(position.x, position.y, position.z);
+              newDiv.threeObject.position.set(
+                position.x,
+                position.y,
+                position.z
+              );
               // 激活div位置实时更新
               newDiv.threeObject.isCSS2DObject = true;
             }
           }
-        }
-      }
-
-
+        };
+      };
     }
-  }
+  },
 };
 
 export default {
@@ -313,79 +458,98 @@ export default {
     this.initScene(this.modelUrl);
   },
   methods: {
-
     initScene(modelUrl) {
       infoMap = new Map();
       // 添加GUI
       gui = new GUI();
-      const hotspotTypeFolder = gui.addFolder('hotspotType');
-      const titleFolder = gui.addFolder('title');
-      const iconFolder = gui.addFolder('icon');
-      const contentFolder = gui.addFolder('content');
+      const hotspotTypeFolder = gui.addFolder("hotspotType");
+      const titleFolder = gui.addFolder("title");
+      const iconFolder = gui.addFolder("icon");
+      const contentFolder = gui.addFolder("content");
 
       hotspotTypeFolder
-        .add(option, 'type', [SPOT_TYPE.TEXT, SPOT_TYPE.IMAGE, SPOT_TYPE.VIDEO, SPOT_TYPE.AUDIO, SPOT_TYPE.LINK, SPOT_TYPE.PANORAMA_LINK])
-        .onChange(
-          (value) => {
-            console.log(value);
+        .add(option, "type", [
+          SPOT_TYPE.TEXT,
+          SPOT_TYPE.IMAGE,
+          SPOT_TYPE.VIDEO,
+          SPOT_TYPE.AUDIO,
+          SPOT_TYPE.LINK,
+          SPOT_TYPE.PANORAMA_LINK,
+        ])
+        .onChange((value) => {
+          option.type = value;
+          if (value === SPOT_TYPE.TEXT) {
+            option.systemIcon = SYSTEM_ICON.TEXT;
+            option.title = "文本热点";
+          } else if (value === SPOT_TYPE.AUDIO) {
+            option.systemIcon = SYSTEM_ICON.AUDIO;
+            option.title = "音频热点";
+          } else if (value === SPOT_TYPE.IMAGE) {
+            option.systemIcon = SYSTEM_ICON.IMAGE;
+            option.title = "图片热点";
+          } else if (value === SPOT_TYPE.LINK) {
+            option.systemIcon = SYSTEM_ICON.LINK;
+            option.title = "超链接热点";
+          } else if (value === SPOT_TYPE.VIDEO) {
+            option.systemIcon = SYSTEM_ICON.VIDEO;
+            option.title = "视频热点";
+          } else if (value === SPOT_TYPE.PANORAMA_LINK) {
+            option.systemIcon = SYSTEM_ICON.PANORAMA_LINK;
+            option.title = "全景热点";
           }
-        );
+        });
 
       // 设置title
       titleFolder
-        .add(option, 'title')
-        .onChange(
-          (value) => {
-            option.title = value;
-          }
-        );
+        .add(option, "title")
+        .onChange((value) => {
+          option.title = value;
+        })
+        .listen();
 
-      // 设置title
-      iconFolder
-        .add(option, 'systemIcon', [SYSTEM_ICON.TEXT, SYSTEM_ICON.IMAGE, SYSTEM_ICON.VIDEO, SYSTEM_ICON.AUDIO, SYSTEM_ICON.LINK, SYSTEM_ICON.PANORAMA_LINK])
-        .onChange(
-          (value) => {
-            // option.title = value;
-
-          }
-        );
+      // 设置systemIcon
+      systemIconUI = iconFolder.add(option, "systemIcon", [
+        SYSTEM_ICON.TEXT,
+        SYSTEM_ICON.IMAGE,
+        SYSTEM_ICON.VIDEO,
+        SYSTEM_ICON.AUDIO,
+        SYSTEM_ICON.LINK,
+        SYSTEM_ICON.PANORAMA_LINK,
+      ]);
+      systemIconUI.onChange((value) => {
+        option.systemIcon = value;
+      });
+      // ui会随着值的变化而变化
+      systemIconUI.listen();
 
       // 内容
-      contentFolder
-        .add(option, 'content')
-        .onChange(
-          (value) => {
-            option.content = value;
-          }
-        );
-
+      contentFolder.add(option, "content").onChange((value) => {
+        option.content = value;
+      });
 
       gui
-        .add(option, 'state', [STATE_TYPE.EDITOR, STATE_TYPE.RUNTIME])
-        .onChange(
-          (value) => {
-            if (value === STATE_TYPE.RUNTIME) {
-              // todo:预览动画
-              if (camera) {
-                var step = { fov: 130 };
-                TWEEN.removeAll();
-                // 使用tween创建fov动画
-                const tween = new TWEEN.Tween(step);
-                tween.to({ fov: defaultFOV }, 1000);
-                tween.easing(TWEEN.Easing.Exponential.InOut);
-                tween.onUpdate(() => {
-                  camera.fov = step.fov;
-                  camera.updateProjectionMatrix();
-                });
-                tween.start();
-              }
-
+        .add(option, "state", [STATE_TYPE.EDITOR, STATE_TYPE.RUNTIME])
+        .onChange((value) => {
+          if (value === STATE_TYPE.RUNTIME) {
+            // todo:预览动画
+            if (camera) {
+              var step = { fov: 130 };
+              TWEEN.removeAll();
+              // 使用tween创建fov动画
+              const tween = new TWEEN.Tween(step);
+              tween.to({ fov: defaultFOV }, 1000);
+              tween.easing(TWEEN.Easing.Exponential.InOut);
+              tween.onUpdate(() => {
+                camera.fov = step.fov;
+                camera.updateProjectionMatrix();
+              });
+              tween.start();
             }
           }
-        );
+        });
 
       // 设置addHotSpot
-      gui.add(option, 'addHotSpot');
+      gui.add(option, "addHotSpot");
 
       scale = 1;
       objects = [];
@@ -447,9 +611,9 @@ export default {
       // 添加CSS2DRenderer
       labelRenderer = new CSS2DRenderer();
       labelRenderer.setSize(window.innerWidth, window.innerHeight);
-      labelRenderer.domElement.style.position = 'absolute';
-      labelRenderer.domElement.style.top = '0px';
-      const mainDiv = document.getElementById('mainDiv');
+      labelRenderer.domElement.style.position = "absolute";
+      labelRenderer.domElement.style.top = "0px";
+      const mainDiv = document.getElementById("mainDiv");
       mainDiv.appendChild(labelRenderer.domElement);
 
       // 添加相机控制器
@@ -606,7 +770,6 @@ export default {
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth * scale, window.innerHeight * scale);
       labelRenderer.setSize(window.innerWidth, window.innerHeight);
-
     },
 
     // 鼠标点击事件
