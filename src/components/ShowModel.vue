@@ -282,8 +282,8 @@ const option = {
             // 关闭相机控制器
             controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.AUDIO) {
-             // 获取mainDiv
-             const mainDiv = document.getElementById("mainDiv");
+            // 获取mainDiv
+            const mainDiv = document.getElementById("mainDiv");
             // 创建文本窗口
             const popWindow = document.createElement("div");
             popWindow.style.width = "120px";
@@ -305,7 +305,7 @@ const option = {
             const titleBar = document.createElement("div");
             titleBar.style.width = "100%";
             titleBar.style.height = "25px";
-            titleBar.textContent = 'Samurai.mp3';
+            titleBar.textContent = "Samurai.mp3";
             // titleBar.style.borderBottomColor = "gray";
             // titleBar.style.borderBottom = "1px solid";
             titleBar.style.paddingLeft = "4px";
@@ -314,10 +314,10 @@ const option = {
             popWindow.appendChild(titleBar);
 
             // 创建音频
-            var mp3Url = "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/test/HoliznaCC0%20-%20Way%20Of%20The%20Samurai.mp3";
+            var mp3Url =
+              "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/test/HoliznaCC0%20-%20Way%20Of%20The%20Samurai.mp3";
             var player = new Audio(mp3Url);
             player.play(); //播放 mp3这个音频对象
-            
 
             // 创建关闭按钮
             const closeButton = document.createElement("div");
@@ -339,7 +339,6 @@ const option = {
               player.pause();
             };
             titleBar.appendChild(closeButton);
-
           } else if (newDiv.className === SPOT_TYPE.LINK) {
             // 获取mainDiv
             const mainDiv = document.getElementById("mainDiv");
@@ -397,7 +396,7 @@ const option = {
             content.style.width = "100%";
             content.style.height = "100%";
             content.data = "https://www.alibabagroup.com/";
-            content.type = 'text/html';
+            content.type = "text/html";
             popWindow.appendChild(content);
 
             // 关闭相机控制器
@@ -467,6 +466,7 @@ const option = {
             // 关闭相机控制器
             controls.enabled = false;
           } else if (newDiv.className === SPOT_TYPE.PANORAMA_LINK) {
+            changeSkyBox();
           }
           return;
         }
@@ -559,6 +559,67 @@ const option = {
   },
 };
 
+function changeSkyBox() {
+  const textures = [];
+  // const px = new THREE.TextureLoader().load(
+  //   "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/px.png"
+  // );
+  // const nx = new THREE.TextureLoader().load(
+  //   "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/nx.png"
+  // );
+  // const py = new THREE.TextureLoader().load(
+  //   "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/py.png"
+  // );
+  // const ny = new THREE.TextureLoader().load(
+  //   "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/ny.png"
+  // );
+  // const pz = new THREE.TextureLoader().load(
+  //   "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/pz.png"
+  // );
+  // const nz = new THREE.TextureLoader().load(
+  //   "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/nz.png"
+  // );
+
+  const px = new THREE.TextureLoader().load(
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/mobile_r.jpg"
+  );
+  const nx = new THREE.TextureLoader().load(
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/mobile_l.jpg"
+  );
+  const py = new THREE.TextureLoader().load(
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/mobile_u.jpg"
+  );
+  const ny = new THREE.TextureLoader().load(
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/mobile_d.jpg"
+  );
+  const pz = new THREE.TextureLoader().load(
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/mobile_f.jpg"
+  );
+  const nz = new THREE.TextureLoader().load(
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/bedRoom/mobile_b.jpg",
+    () => {
+      const materials = [];
+      for (let i = 0; i < 6; i++) {
+        materials.push(new THREE.MeshBasicMaterial({ map: textures[i] }));
+      }
+      skyBox.material = materials;
+      objects.forEach((ele) => {
+        ele.visible = false;
+      });
+
+      for (let k of infoMap.keys()) {
+        scene.remove(k.threeObject);
+        k.remove();
+      }
+    }
+  );
+  textures.push(px);
+  textures.push(nx);
+  textures.push(py);
+  textures.push(ny);
+  textures.push(pz);
+  textures.push(nz);
+}
 export default {
   props: {
     modelUrl: {
