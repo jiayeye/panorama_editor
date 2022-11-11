@@ -73,7 +73,7 @@ const option = {
   type: SPOT_TYPE.TEXT,
   title: "文本热点",
   content:
-    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/test/mobile_f.jpg",
+    "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/test/pnram.jpg",
   systemIcon:
     "https://syn-yf-design-tool.oss-cn-beijing.aliyuncs.com/panorama/editor/systemIcon/54_static_txt.png",
   state: "editor",
